@@ -41,11 +41,16 @@ export default function AdminUsersPage() {
     }
 
     // Fetch all users
-    const { data: usersData } = await supabase
+    const { data: usersData, error } = await supabase
       .from('user_roles')
       .select('*')
       .order('created_at', { ascending: false })
 
+    if (error) {
+      console.error('Error fetching users:', error)
+    }
+
+    console.log('Fetched users:', usersData)
     setUsers(usersData || [])
     setLoading(false)
   }
