@@ -8,7 +8,7 @@ export default function NewUserPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    role: 'viewer' as 'admin' | 'editor' | 'viewer'
+    role: 'sales_team' as 'admin' | 'music_producer' | 'sales_team'
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -108,8 +108,8 @@ export default function NewUserPage() {
               onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              <option value="viewer">Viewer</option>
-              <option value="editor">Editor</option>
+              <option value="sales_team">Sales Team</option>
+              <option value="music_producer">Music Producer</option>
               <option value="admin">Admin</option>
             </select>
           </div>
