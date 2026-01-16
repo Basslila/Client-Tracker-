@@ -181,19 +181,19 @@ export default function DashboardPage() {
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Projects by Status</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+            <p className="text-sm font-medium text-yellow-700 mb-1">Active</p>
+            <p className="text-2xl font-bold text-yellow-900">{projectsByStatus.active}</p>
+          </div>
+
           <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-            <p className="text-sm font-medium text-green-700 mb-1">Active</p>
-            <p className="text-2xl font-bold text-green-900">{projectsByStatus.active}</p>
+            <p className="text-sm font-medium text-green-700 mb-1">Completed</p>
+            <p className="text-2xl font-bold text-green-900">{projectsByStatus.completed}</p>
           </div>
 
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <p className="text-sm font-medium text-blue-700 mb-1">Completed</p>
-            <p className="text-2xl font-bold text-blue-900">{projectsByStatus.completed}</p>
-          </div>
-
-          <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-            <p className="text-sm font-medium text-orange-700 mb-1">On Hold</p>
-            <p className="text-2xl font-bold text-orange-900">{projectsByStatus.onHold}</p>
+          <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <p className="text-sm font-medium text-gray-700 mb-1">On Hold</p>
+            <p className="text-2xl font-bold text-gray-900">{projectsByStatus.onHold}</p>
           </div>
 
           <div className="bg-red-50 p-4 rounded-lg border border-red-200">

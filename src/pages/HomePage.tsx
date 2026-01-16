@@ -179,10 +179,10 @@ export default function HomePage() {
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         canEdit(userRole as any) ? 'cursor-pointer hover:opacity-80' : ''
                       } ${
-                        client.status === 'Active' ? 'bg-green-100 text-green-800' :
-                        client.status === 'On Hold' ? 'bg-yellow-100 text-yellow-800' :
+                        client.status === 'Active' ? 'bg-yellow-100 text-yellow-800' :
+                        client.status === 'On Hold' ? 'bg-gray-100 text-gray-800' :
                         client.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                        client.status === 'Completed' ? 'bg-blue-100 text-blue-800' :
+                        client.status === 'Completed' ? 'bg-green-100 text-green-800' :
                         'bg-gray-100 text-gray-800'
                       }`}
                     >
