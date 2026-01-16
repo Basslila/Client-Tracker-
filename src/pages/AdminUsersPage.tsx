@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Plus } from 'lucide-react'
+import { Plus, RefreshCw } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { getRoleLabel } from '../lib/permissions'
 
@@ -17,38 +17,38 @@ export default function AdminUsersPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    async function fetchData() {
-      const { data: { user } } = await supabase.auth.getUser()
-
-      if (!user) {
-        navigate('/login')
-        return
-      }
-
-      // Check if user is admin
-      const { data: currentUserRole } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
-      if (currentUserRole?.role !== 'admin') {
-        navigate('/')
-        return
-      }
-
-      // Fetch all users
-      const { data: usersData } = await supabase
-        .from('user_roles')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      setUsers(usersData || [])
-      setLoading(false)
-    }
-
     fetchData()
   }, [navigate])
+
+  async function fetchData() {
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      navigate('/login')
+      return
+    }
+
+    // Check if user is admin
+    const { data: currentUserRole } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (currentUserRole?.role !== 'admin') {
+      navigate('/')
+      return
+    }
+
+    // Fetch all users
+    const { data: usersData } = await supabase
+      .from('user_roles')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    setUsers(usersData || [])
+    setLoading(false)
+  }
 
   if (loading) {
     return <div className="text-gray-600">Loading...</div>
@@ -61,13 +61,22 @@ export default function AdminUsersPage() {
           <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
           <p className="text-sm text-gray-500 mt-1">Manage user accounts and roles</p>
         </div>
-        <Link
-          to="/admin/users/new"
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-        >
-          <Plus size={20} />
-          <span>Add User</span>
-        </Link>
+        <div className="flex gap-3">
+          <button
+            onClick={fetchData}
+            className="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <RefreshCw size={20} />
+            <span>Refresh</span>
+          </button>
+          <Link
+            to="/admin/users/new"
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+          >
+            <Plus size={20} />
+            <span>Add User</span>
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

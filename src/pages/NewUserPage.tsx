@@ -19,10 +19,16 @@ export default function NewUserPage() {
     setError(null)
 
     try {
-      // Sign up the new user
+      // Sign up the new user with auto-confirmed email
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            email_confirmed: true
+          }
+        }
       })
 
       if (signUpError) throw signUpError
@@ -39,6 +45,7 @@ export default function NewUserPage() {
 
       if (roleError) throw roleError
 
+      alert('User created successfully! They can now login.')
       navigate('/admin/users')
     } catch (err: any) {
       console.error('Error creating user:', err)
