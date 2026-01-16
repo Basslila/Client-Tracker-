@@ -1,34 +1,52 @@
-import { createClient } from '@/utils/supabase/server'
-import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { User, Phone, Mail, Plus } from 'lucide-react'
-import { canEdit } from '@/utils/permissions'
-import { redirect } from 'next/navigation'
+import { supabase } from '../lib/supabase'
+import { canEdit } from '../lib/permissions'
 
-export default async function Home() {
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    redirect('/login')
+interface Client {
+  id: string
+  name: string
+  email: string | null
+  phone: string | null
+  created_at: string
+}
+
+export default function HomePage() {
+  const [clients, setClients] = useState<Client[]>([])
+  const [userRole, setUserRole] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (user) {
+        const [roleData, clientsData] = await Promise.all([
+          supabase.from('user_roles').select('role').eq('id', user.id).single(),
+          supabase.from('clients').select('*').order('created_at', { ascending: false })
+        ])
+
+        setUserRole(roleData.data?.role || null)
+        setClients(clientsData.data || [])
+      }
+      setLoading(false)
+    }
+
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return <div className="text-gray-600">Loading...</div>
   }
-
-  // Parallel query execution for better performance
-  const [{ data: userRole }, { data: clients }] = await Promise.all([
-    supabase
-      .from('user_roles')
-      .select('role')
-      .eq('id', user.id)
-      .single(),
-    supabase.from('clients').select('id, name, email, phone, created_at').order('created_at', { ascending: false })
-  ])
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
-        {canEdit((userRole?.role as any) || null) && (
-          <Link 
-            href="/clients/new"
+        {canEdit(userRole as any) && (
+          <Link
+            to="/clients/new"
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
           >
             <Plus size={20} />
@@ -49,10 +67,10 @@ export default async function Home() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {clients?.map((client) => (
+            {clients.map((client) => (
               <tr key={client.id} className="hover:bg-gray-50 transition-colors group">
                 <td className="px-6 py-4">
-                  <Link href={`/clients/${client.id}`} className="flex items-center gap-3 font-medium text-gray-900 hover:text-blue-600">
+                  <Link to={`/clients/${client.id}`} className="flex items-center gap-3 font-medium text-gray-900 hover:text-blue-600">
                     <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
                       <User size={16} />
                     </div>
@@ -79,8 +97,8 @@ export default async function Home() {
                   {new Date(client.created_at).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4">
-                  <Link 
-                    href={`/clients/${client.id}`}
+                  <Link
+                    to={`/clients/${client.id}`}
                     className="text-sm font-medium text-blue-600 hover:text-blue-800"
                   >
                     View Projects
@@ -88,7 +106,7 @@ export default async function Home() {
                 </td>
               </tr>
             ))}
-            {(!clients || clients.length === 0) && (
+            {clients.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                   <div className="flex flex-col items-center justify-center">
