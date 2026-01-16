@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/utils/cn";
+import { cn } from "../lib/cn";
 import { Calendar, CheckCircle2, Circle, Trash2, Plus, Check, X } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
