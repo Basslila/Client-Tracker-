@@ -57,19 +57,18 @@ export default function DashboardPage() {
   async function fetchData() {
     const { data: { user } } = await supabase.auth.getUser()
 
-      if (user) {
-        const [roleData, clientsData, projectsData] = await Promise.all([
-          supabase.from('user_roles').select('role').eq('id', user.id).single(),
-          supabase.from('clients').select('id, created_at'),
-          supabase.from('projects').select('id, created_at, budget, amount_paid, status'),
-        ])
+    if (user) {
+      const [roleData, clientsData, projectsData] = await Promise.all([
+        supabase.from('user_roles').select('role').eq('id', user.id).single(),
+        supabase.from('clients').select('id, created_at'),
+        supabase.from('projects').select('id, created_at, budget, amount_paid, status'),
+      ])
 
-        setUserRole((roleData.data?.role as UserRole) || null)
-        setClients(clientsData.data || [])
-        setProjects(projectsData.data || [])
-      }
-      setLoading(false)
+      setUserRole((roleData.data?.role as UserRole) || null)
+      setClients(clientsData.data || [])
+      setProjects(projectsData.data || [])
     }
+    setLoading(false)
   }
 
   if (loading) {
