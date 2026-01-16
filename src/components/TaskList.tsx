@@ -61,7 +61,7 @@ const itemVariants = {
 };
 
 // --- MAIN COMPONENT ---
-export const TaskList = ({ tasks, projectId }: TaskListProps) => {
+export const TaskList = ({ tasks }: TaskListProps) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
