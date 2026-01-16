@@ -1,8 +1,10 @@
 
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../lib/cn";
 import { IndianRupee } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "../lib/supabase";
 
 // --- TYPE DEFINITIONS ---
 export interface Project {
@@ -20,6 +22,8 @@ export interface Project {
 export interface ProjectListProps {
   projects: Project[];
   showMoney: boolean;
+  canEdit?: boolean;
+  onProjectsChange?: () => void;
 }
 
 // --- FRAMER MOTION VARIANTS ---
@@ -47,7 +51,25 @@ const itemVariants = {
 };
 
 // --- MAIN COMPONENT ---
-export const ProjectList = ({ projects, showMoney }: ProjectListProps) => {
+export const ProjectList = ({ projects, showMoney, canEdit = false, onProjectsChange }: ProjectListProps) => {
+  const [editingStatusId, setEditingStatusId] = useState<string | null>(null);
+
+  const handleStatusChange = async (projectId: string, newStatus: string) => {
+    const { error } = await supabase
+      .from('projects')
+      .update({ status: newStatus })
+      .eq('id', projectId);
+
+    if (error) {
+      console.error('Error updating status:', error);
+      alert('Error updating status');
+      return;
+    }
+
+    setEditingStatusId(null);
+    onProjectsChange?.();
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <div className="overflow-x-auto">
@@ -128,16 +150,35 @@ export const ProjectList = ({ projects, showMoney }: ProjectListProps) => {
                       </td>
                     )}
                     <td className="px-6 py-4">
-                      <span className={cn(
-                        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
-                        project.status === 'In Progress' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 
-                        project.status === 'On Hold' ? 'bg-orange-50 text-orange-700 border-orange-200' : 
-                        project.status === 'Completed' ? 'bg-green-50 text-green-700 border-green-200' : 
-                        project.status === 'Cancelled' ? 'bg-red-50 text-red-700 border-red-200' : 
-                        'bg-gray-100 text-gray-800 border-gray-200'
-                      )}>
-                        {project.status}
-                      </span>
+                      {editingStatusId === project.id && canEdit ? (
+                        <select
+                          value={project.status || 'Active'}
+                          onChange={(e) => handleStatusChange(project.id, e.target.value)}
+                          onBlur={() => setEditingStatusId(null)}
+                          autoFocus
+                          className="px-2.5 py-0.5 text-xs font-medium rounded-full border focus:ring-2 focus:ring-blue-500 bg-gray-50 text-gray-700 border-gray-200"
+                        >
+                          <option value="Active">Active</option>
+                          <option value="On Hold">On Hold</option>
+                          <option value="Cancelled">Cancelled</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                      ) : (
+                        <span 
+                          onClick={() => canEdit && setEditingStatusId(project.id)}
+                          className={cn(
+                            "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
+                            canEdit ? 'cursor-pointer hover:opacity-80' : '',
+                            project.status === 'Active' ? 'bg-green-50 text-green-700 border-green-200' : 
+                            project.status === 'On Hold' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 
+                            project.status === 'Completed' ? 'bg-blue-50 text-blue-700 border-blue-200' : 
+                            project.status === 'Cancelled' ? 'bg-red-50 text-red-700 border-red-200' : 
+                            'bg-gray-100 text-gray-800 border-gray-200'
+                          )}
+                        >
+                          {project.status}
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {project.start_date ? new Date(project.start_date).toLocaleDateString() : '-'}

@@ -9,6 +9,7 @@ interface Client {
   name: string
   email: string | null
   phone: string | null
+  status: string | null
   created_at: string
 }
 
@@ -16,25 +17,42 @@ export default function HomePage() {
   const [clients, setClients] = useState<Client[]>([])
   const [userRole, setUserRole] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [editingStatusId, setEditingStatusId] = useState<string | null>(null)
 
   useEffect(() => {
-    async function fetchData() {
-      const { data: { user } } = await supabase.auth.getUser()
-
-      if (user) {
-        const [roleData, clientsData] = await Promise.all([
-          supabase.from('user_roles').select('role').eq('id', user.id).single(),
-          supabase.from('clients').select('*').order('created_at', { ascending: false })
-        ])
-
-        setUserRole(roleData.data?.role || null)
-        setClients(clientsData.data || [])
-      }
-      setLoading(false)
-    }
-
     fetchData()
   }, [])
+
+  async function fetchData() {
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (user) {
+      const [roleData, clientsData] = await Promise.all([
+        supabase.from('user_roles').select('role').eq('id', user.id).single(),
+        supabase.from('clients').select('*').order('created_at', { ascending: false })
+      ])
+
+      setUserRole(roleData.data?.role || null)
+      setClients(clientsData.data || [])
+    }
+    setLoading(false)
+  }
+
+  const handleStatusChange = async (clientId: string, newStatus: string) => {
+    const { error } = await supabase
+      .from('clients')
+      .update({ status: newStatus })
+      .eq('id', clientId)
+
+    if (error) {
+      console.error('Error updating status:', error)
+      alert('Error updating status')
+      return
+    }
+
+    setEditingStatusId(null)
+    fetchData()
+  }
 
   if (loading) {
     return <div className="text-gray-600">Loading...</div>
@@ -62,6 +80,7 @@ export default function HomePage() {
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">Client Name</th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">Email</th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">Phone</th>
+              <th className="px-6 py-4 text-sm font-semibold text-gray-600">Status</th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">Created At</th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">Actions</th>
             </tr>
@@ -93,6 +112,37 @@ export default function HomePage() {
                     </div>
                   ) : '-'}
                 </td>
+                <td className="px-6 py-4">
+                  {editingStatusId === client.id && canEdit(userRole as any) ? (
+                    <select
+                      value={client.status || 'Active'}
+                      onChange={(e) => handleStatusChange(client.id, e.target.value)}
+                      onBlur={() => setEditingStatusId(null)}
+                      autoFocus
+                      className="px-2.5 py-0.5 text-xs font-medium rounded-full border focus:ring-2 focus:ring-blue-500 bg-gray-50 text-gray-700 border-gray-200"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="On Hold">On Hold</option>
+                      <option value="Cancelled">Cancelled</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  ) : (
+                    <span 
+                      onClick={() => canEdit(userRole as any) && setEditingStatusId(client.id)}
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        canEdit(userRole as any) ? 'cursor-pointer hover:opacity-80' : ''
+                      } ${
+                        client.status === 'Active' ? 'bg-green-100 text-green-800' :
+                        client.status === 'On Hold' ? 'bg-yellow-100 text-yellow-800' :
+                        client.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
+                        client.status === 'Completed' ? 'bg-blue-100 text-blue-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {client.status || 'Active'}
+                    </span>
+                  )}
+                </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {new Date(client.created_at).toLocaleDateString()}
                 </td>
@@ -108,7 +158,7 @@ export default function HomePage() {
             ))}
             {clients.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                   <div className="flex flex-col items-center justify-center">
                     <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3 text-gray-400">
                       <User size={24} />

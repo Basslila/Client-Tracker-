@@ -11,23 +11,23 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<any[]>([])
 
   useEffect(() => {
-    async function fetchData() {
-      const { data: { user } } = await supabase.auth.getUser()
-
-      if (user) {
-        const [roleData, projectsData] = await Promise.all([
-          supabase.from('user_roles').select('role').eq('id', user.id).single(),
-          supabase.from('projects').select('*, clients(name)').order('created_at', { ascending: false })
-        ])
-
-        setUserRole((roleData.data?.role as UserRole) || null)
-        setProjects(projectsData.data || [])
-      }
-      setLoading(false)
-    }
-
     fetchData()
   }, [])
+
+  async function fetchData() {
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (user) {
+      const [roleData, projectsData] = await Promise.all([
+        supabase.from('user_roles').select('role').eq('id', user.id).single(),
+        supabase.from('projects').select('*, clients(name)').order('created_at', { ascending: false })
+      ])
+
+      setUserRole((roleData.data?.role as UserRole) || null)
+      setProjects(projectsData.data || [])
+    }
+    setLoading(false)
+  }
 
   if (loading) {
     return <div className="text-gray-600">Loading...</div>
@@ -50,7 +50,7 @@ export default function ProjectsPage() {
         )}
       </div>
 
-      <ProjectList projects={projects} showMoney={showMoney} />
+      <ProjectList projects={projects} showMoney={showMoney} canEdit={canEdit(userRole)} onProjectsChange={fetchData} />
     </div>
   )
 }
