@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { ArrowLeft } from 'lucide-react'
+import { UserRole } from '../lib/permissions'
 
 interface Client {
   id: string
@@ -15,6 +16,7 @@ export default function NewProjectPage() {
   
   const [loading, setLoading] = useState(false)
   const [clients, setClients] = useState<Client[]>([])
+  const [userRole, setUserRole] = useState<UserRole | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     client_id: preselectedClientId || '',
@@ -24,15 +26,25 @@ export default function NewProjectPage() {
   })
 
   useEffect(() => {
-    async function fetchClients() {
-      const { data } = await supabase
-        .from('clients')
-        .select('id, name')
-        .order('name')
+    async function fetchData() {
+      const [clientsData, { data: { user } }] = await Promise.all([
+        supabase.from('clients').select('id, name').order('name'),
+        supabase.auth.getUser()
+      ])
       
-      if (data) setClients(data)
+      if (clientsData.data) setClients(clientsData.data)
+      
+      if (user) {
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single()
+        
+        if (roleData) setUserRole(roleData.role as UserRole)
+      }
     }
-    fetchClients()
+    fetchData()
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -147,20 +159,22 @@ export default function NewProjectPage() {
           />
         </div>
 
-        <div>
-          <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
-            Budget ($)
-          </label>
-          <input
-            type="number"
-            id="budget"
-            step="0.01"
-            value={formData.budget}
-            onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="0.00"
-          />
-        </div>
+        {userRole === 'admin' && (
+          <div>
+            <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
+              Budget ($)
+            </label>
+            <input
+              type="number"
+              id="budget"
+              step="0.01"
+              value={formData.budget}
+              onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="0.00"
+            />
+          </div>
+        )}
 
         <div className="flex gap-3 pt-4">
           <button
