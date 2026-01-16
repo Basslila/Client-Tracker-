@@ -149,7 +149,7 @@ export default function NewProjectPage() {
         {userRole === 'admin' && (
           <div>
             <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
-              Budget ($)
+              Budget (₹)
             </label>
             <input
               type="number"

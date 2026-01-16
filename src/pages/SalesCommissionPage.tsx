@@ -77,7 +77,7 @@ export default function SalesCommissionPage() {
             <div>
               <p className="text-sm text-gray-600">Total Budget</p>
               <p className="text-2xl font-bold text-gray-900">
-                ${totalBudget.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₹{totalBudget.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function SalesCommissionPage() {
             <div>
               <p className="text-sm text-gray-600">Total Commission</p>
               <p className="text-2xl font-bold text-green-600">
-                ${totalCommission.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₹{totalCommission.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
           </div>
@@ -203,7 +203,7 @@ export default function SalesCommissionPage() {
                       </td>
                       <td className="px-6 py-4 text-right text-sm font-medium text-gray-900">
                         {project.budget 
-                          ? `$${project.budget.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                          ? `₹${project.budget.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                           : '-'
                         }
                       </td>
@@ -215,7 +215,7 @@ export default function SalesCommissionPage() {
                       </td>
                       <td className="px-6 py-4 text-right text-sm font-bold text-green-600">
                         {commissionAmount > 0
-                          ? `$${commissionAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                          ? `₹${commissionAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                           : '-'
                         }
                       </td>
