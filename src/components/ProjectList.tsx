@@ -14,6 +14,7 @@ export interface Project {
   progress: number | null;
   budget: number | null;
   amount_paid: number | null;
+  advance_payment: number | null;
   status: string | null;
   created_at: string;
   start_date?: string | null;
@@ -151,7 +152,7 @@ export const ProjectList = ({
             <AnimatePresence mode="wait">
               {projects.map((project) => {
                 const budget = project.budget ? Number(project.budget) : 0;
-                const advancePayment = project.amount_paid ? Number(project.amount_paid) : 0;
+                const advancePayment = project.advance_payment ? Number(project.advance_payment) : 0;
                 const moneyLeft = budget - advancePayment;
                 // @ts-ignore
                 const clientName = project.clients?.name || (Array.isArray(project.clients) ? project.clients[0]?.name : '');
@@ -191,7 +192,7 @@ export const ProjectList = ({
                     )}
                     {showMoney && (
                       <td className="px-6 py-4 text-sm text-green-600 font-medium">
-                        {project.amount_paid ? `₹${Number(project.amount_paid).toLocaleString()}` : '-'}
+                        {project.advance_payment ? `₹${Number(project.advance_payment).toLocaleString()}` : '-'}
                       </td>
                     )}
                     {showMoney && (
