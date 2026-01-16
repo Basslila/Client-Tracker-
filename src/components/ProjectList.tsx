@@ -84,8 +84,8 @@ export const ProjectList = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-visible">
-      <div className="overflow-x-auto overflow-y-visible">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+      <div className="overflow-x-auto">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -96,12 +96,15 @@ export const ProjectList = ({
               {showMoney && <th className="px-6 py-4 text-sm font-semibold text-gray-600">Advance Payment</th>}
               {showMoney && <th className="px-6 py-4 text-sm font-semibold text-gray-600">Money to Receive</th>}
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 relative">
                   <span>Status</span>
                   {setStatusFilter && setShowFilterDropdown && (
-                    <div className="relative">
+                    <>
                       <button
-                        onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowFilterDropdown(!showFilterDropdown);
+                        }}
                         className={`p-1 rounded hover:bg-gray-200 transition-colors ${
                           statusFilter !== 'All' ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
                         }`}
@@ -109,24 +112,30 @@ export const ProjectList = ({
                         <Filter size={16} />
                       </button>
                       {showFilterDropdown && (
-                        <div className="absolute top-full right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                          {['All', 'Active', 'On Hold', 'Cancelled', 'Completed'].map((status) => (
-                            <button
-                              key={status}
-                              onClick={() => {
-                                setStatusFilter(status)
-                                setShowFilterDropdown(false)
-                              }}
-                              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
-                                statusFilter === status ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
-                              }`}
-                            >
-                              {status}
-                            </button>
-                          ))}
-                        </div>
+                        <>
+                          <div 
+                            className="fixed inset-0 z-40" 
+                            onClick={() => setShowFilterDropdown(false)}
+                          />
+                          <div className="absolute top-full right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-xl z-50">
+                            {['All', 'Active', 'On Hold', 'Cancelled', 'Completed'].map((status) => (
+                              <button
+                                key={status}
+                                onClick={() => {
+                                  setStatusFilter(status)
+                                  setShowFilterDropdown(false)
+                                }}
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                                  statusFilter === status ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
+                                }`}
+                              >
+                                {status}
+                              </button>
+                            ))}
+                          </div>
+                        </>
                       )}
-                    </div>
+                    </>
                   )}
                 </div>
               </th>
