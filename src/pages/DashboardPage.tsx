@@ -24,8 +24,38 @@ export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([])
 
   useEffect(() => {
-    async function fetchData() {
-      const { data: { user } } = await supabase.auth.getUser()
+    fetchData()
+
+    // Set up real-time subscription for projects
+    const projectsSubscription = supabase
+      .channel('projects_changes')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'projects' },
+        () => {
+          fetchData()
+        }
+      )
+      .subscribe()
+
+    // Set up real-time subscription for clients
+    const clientsSubscription = supabase
+      .channel('clients_changes')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'clients' },
+        () => {
+          fetchData()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      projectsSubscription.unsubscribe()
+      clientsSubscription.unsubscribe()
+    }
+  }, [])
+
+  async function fetchData() {
+    const { data: { user } } = await supabase.auth.getUser()
 
       if (user) {
         const [roleData, clientsData, projectsData] = await Promise.all([
@@ -40,9 +70,7 @@ export default function DashboardPage() {
       }
       setLoading(false)
     }
-
-    fetchData()
-  }, [])
+  }
 
   if (loading) {
     return <div className="text-gray-600">Loading...</div>
@@ -55,7 +83,7 @@ export default function DashboardPage() {
   const totalBudget = showMoney ? projects.reduce((sum, p) => sum + (p.budget || 0), 0) : 0
 
   const projectsByStatus = {
-    inProgress: projects.filter(p => p.status === 'In Progress').length,
+    active: projects.filter(p => p.status === 'Active').length,
     onHold: projects.filter(p => p.status === 'On Hold').length,
     completed: projects.filter(p => p.status === 'Completed').length,
     cancelled: projects.filter(p => p.status === 'Cancelled').length,
@@ -154,14 +182,14 @@ export default function DashboardPage() {
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Projects by Status</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-            <p className="text-sm font-medium text-yellow-700 mb-1">In Progress</p>
-            <p className="text-2xl font-bold text-yellow-900">{projectsByStatus.inProgress}</p>
+          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+            <p className="text-sm font-medium text-green-700 mb-1">Active</p>
+            <p className="text-2xl font-bold text-green-900">{projectsByStatus.active}</p>
           </div>
 
-          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-            <p className="text-sm font-medium text-green-700 mb-1">Completed</p>
-            <p className="text-2xl font-bold text-green-900">{projectsByStatus.completed}</p>
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <p className="text-sm font-medium text-blue-700 mb-1">Completed</p>
+            <p className="text-2xl font-bold text-blue-900">{projectsByStatus.completed}</p>
           </div>
 
           <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
