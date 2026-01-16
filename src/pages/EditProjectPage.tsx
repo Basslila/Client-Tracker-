@@ -20,7 +20,6 @@ export default function EditProjectPage() {
     name: '',
     client_id: '',
     status: 'Active',
-    progress: 0,
     budget: '',
     commission_enabled: false,
     commission_percentage: '10',
@@ -43,7 +42,6 @@ export default function EditProjectPage() {
           name: projectData.data.name,
           client_id: projectData.data.client_id,
           status: projectData.data.status,
-          progress: projectData.data.progress,
           budget: projectData.data.budget?.toString() || '',
           commission_enabled: projectData.data.commission_enabled || false,
           commission_percentage: projectData.data.commission_percentage?.toString() || '10',
@@ -54,7 +52,7 @@ export default function EditProjectPage() {
         const { data: roleData } = await supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single()
         
         if (roleData) setUserRole(roleData.role as UserRole)
@@ -71,7 +69,6 @@ export default function EditProjectPage() {
       name: formData.name,
       client_id: formData.client_id,
       status: formData.status,
-      progress: formData.progress,
       budget: formData.budget ? parseFloat(formData.budget) : null,
       commission_enabled: formData.commission_enabled,
       commission_percentage: parseFloat(formData.commission_percentage),

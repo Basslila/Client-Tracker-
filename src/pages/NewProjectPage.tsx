@@ -21,7 +21,6 @@ export default function NewProjectPage() {
     name: '',
     client_id: preselectedClientId || '',
     status: 'Active',
-    progress: 0,
     budget: '',
     commission_enabled: false,
     commission_percentage: '10',
@@ -40,7 +39,7 @@ export default function NewProjectPage() {
         const { data: roleData } = await supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .single()
         
         if (roleData) setUserRole(roleData.role as UserRole)
@@ -57,7 +56,6 @@ export default function NewProjectPage() {
       name: formData.name,
       client_id: formData.client_id,
       status: formData.status,
-      progress: formData.progress,
       budget: formData.budget ? parseFloat(formData.budget) : null,
       commission_enabled: formData.commission_enabled,
       commission_percentage: parseFloat(formData.commission_percentage),
@@ -146,21 +144,6 @@ export default function NewProjectPage() {
             <option value="Cancelled">Cancelled</option>
             <option value="Completed">Completed</option>
           </select>
-        </div>
-
-        <div>
-          <label htmlFor="progress" className="block text-sm font-medium text-gray-700 mb-2">
-            Progress ({formData.progress}%)
-          </label>
-          <input
-            type="range"
-            id="progress"
-            min="0"
-            max="100"
-            value={formData.progress}
-            onChange={(e) => setFormData({ ...formData, progress: parseInt(e.target.value) })}
-            className="w-full"
-          />
         </div>
 
         {userRole === 'admin' && (
