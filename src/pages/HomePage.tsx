@@ -99,7 +99,7 @@ export default function HomePage() {
                       <Filter size={16} />
                     </button>
                     {showFilterDropdown && (
-                      <div className="absolute top-full right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                      <div className="absolute top-full right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                         {['All', 'Active', 'On Hold', 'Cancelled', 'Completed'].map((status) => (
                           <button
                             key={status}
