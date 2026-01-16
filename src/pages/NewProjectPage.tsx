@@ -23,6 +23,8 @@ export default function NewProjectPage() {
     status: 'Active',
     progress: 0,
     budget: '',
+    commission_enabled: false,
+    commission_percentage: '10',
   })
 
   useEffect(() => {
@@ -57,6 +59,8 @@ export default function NewProjectPage() {
       status: formData.status,
       progress: formData.progress,
       budget: formData.budget ? parseFloat(formData.budget) : null,
+      commission_enabled: formData.commission_enabled,
+      commission_percentage: parseFloat(formData.commission_percentage),
     }
 
     const { data, error } = await supabase
@@ -174,6 +178,51 @@ export default function NewProjectPage() {
               placeholder="0.00"
             />
           </div>
+        )}
+
+        {userRole === 'admin' && (
+          <>
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Sales Commission
+                </label>
+                <p className="text-xs text-gray-500">Enable commission tracking for this project</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, commission_enabled: !formData.commission_enabled })}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  formData.commission_enabled ? 'bg-blue-600' : 'bg-gray-200'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    formData.commission_enabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {formData.commission_enabled && (
+              <div>
+                <label htmlFor="commission_percentage" className="block text-sm font-medium text-gray-700 mb-2">
+                  Commission Percentage (%)
+                </label>
+                <input
+                  type="number"
+                  id="commission_percentage"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  value={formData.commission_percentage}
+                  onChange={(e) => setFormData({ ...formData, commission_percentage: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="10.00"
+                />
+              </div>
+            )}
+          </>
         )}
 
         <div className="flex gap-3 pt-4">

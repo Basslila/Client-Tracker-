@@ -16,6 +16,7 @@ import NewClientPage from './pages/NewClientPage'
 import NewTaskPage from './pages/NewTaskPage'
 import AdminUsersPage from './pages/AdminUsersPage'
 import NewUserPage from './pages/NewUserPage'
+import SalesCommissionPage from './pages/SalesCommissionPage'
 
 function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -86,6 +87,7 @@ function App() {
               <Route path="/tasks/new" element={<NewTaskPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />
               <Route path="/admin/users/new" element={<NewUserPage />} />
+              <Route path="/admin/sales-commission" element={<SalesCommissionPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>

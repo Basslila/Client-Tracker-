@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Folder, Users, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, Folder, Users, Settings, LogOut, DollarSign } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { User } from '@supabase/supabase-js'
@@ -85,19 +85,34 @@ export default function Sidebar({ user }: { user: User }) {
             </li>
           ))}
           {isAdmin && (
-            <li>
-              <NavLink
-                to="/admin/users"
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium ${
-                    isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:text-blue-600'
-                  }`
-                }
-              >
-                <Settings size={20} />
-                <span>User Management</span>
-              </NavLink>
-            </li>
+            <>
+              <li>
+                <NavLink
+                  to="/admin/users"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium ${
+                      isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:text-blue-600'
+                    }`
+                  }
+                >
+                  <Settings size={20} />
+                  <span>User Management</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/admin/sales-commission"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium ${
+                      isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:text-blue-600'
+                    }`
+                  }
+                >
+                  <DollarSign size={20} />
+                  <span>Sales Commission</span>
+                </NavLink>
+              </li>
+            </>
           )}
         </ul>
       </nav>
