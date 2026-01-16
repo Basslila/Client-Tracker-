@@ -1,0 +1,12 @@
+middleware.ts
+next.config.ts
+next-env.d.ts
+app/
+components/Sidebar.tsx
+components/DashboardCharts.tsx
+components/DashboardViews.tsx
+components/ProjectList.tsx
+components/TaskList.tsx
+utils/
+netlify.toml
+.next/
