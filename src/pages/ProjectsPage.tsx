@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus } from 'lucide-react'
+import { Plus, Filter } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { canEdit, canSeeMoney, UserRole } from '../lib/permissions'
 import { ProjectList } from '../components/ProjectList'
@@ -10,6 +10,7 @@ export default function ProjectsPage() {
   const [userRole, setUserRole] = useState<UserRole>(null)
   const [projects, setProjects] = useState<any[]>([])
   const [statusFilter, setStatusFilter] = useState<string>('All')
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false)
 
   useEffect(() => {
     fetchData()
@@ -54,23 +55,16 @@ export default function ProjectsPage() {
         )}
       </div>
 
-      <div className="flex gap-2">
-        {['All', 'Active', 'On Hold', 'Cancelled', 'Completed'].map((status) => (
-          <button
-            key={status}
-            onClick={() => setStatusFilter(status)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              statusFilter === status
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            {status}
-          </button>
-        ))}
-      </div>
-
-      <ProjectList projects={filteredProjects} showMoney={showMoney} canEdit={canEdit(userRole)} onProjectsChange={fetchData} />
+      <ProjectList 
+        projects={filteredProjects} 
+        showMoney={showMoney} 
+        canEdit={canEdit(userRole)} 
+        onProjectsChange={fetchData}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        showFilterDropdown={showFilterDropdown}
+        setShowFilterDropdown={setShowFilterDropdown}
+      />
     </div>
   )
 }

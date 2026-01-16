@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { User, Phone, Mail, Plus } from 'lucide-react'
+import { User, Phone, Mail, Plus, Filter } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { canEdit } from '../lib/permissions'
 
@@ -19,6 +19,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [editingStatusId, setEditingStatusId] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<string>('All')
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false)
 
   useEffect(() => {
     fetchData()
@@ -78,22 +79,6 @@ export default function HomePage() {
         )}
       </div>
 
-      <div className="flex gap-2">
-        {['All', 'Active', 'On Hold', 'Cancelled', 'Completed'].map((status) => (
-          <button
-            key={status}
-            onClick={() => setStatusFilter(status)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              statusFilter === status
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            {status}
-          </button>
-        ))}
-      </div>
-
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-200">
@@ -101,7 +86,39 @@ export default function HomePage() {
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">Client Name</th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">Email</th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">Phone</th>
-              <th className="px-6 py-4 text-sm font-semibold text-gray-600">Status</th>
+              <th className="px-6 py-4 text-sm font-semibold text-gray-600">
+                <div className="flex items-center gap-2">
+                  <span>Status</span>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                      className={`p-1 rounded hover:bg-gray-200 transition-colors ${
+                        statusFilter !== 'All' ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
+                      }`}
+                    >
+                      <Filter size={16} />
+                    </button>
+                    {showFilterDropdown && (
+                      <div className="absolute top-full right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                        {['All', 'Active', 'On Hold', 'Cancelled', 'Completed'].map((status) => (
+                          <button
+                            key={status}
+                            onClick={() => {
+                              setStatusFilter(status)
+                              setShowFilterDropdown(false)
+                            }}
+                            className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                              statusFilter === status ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
+                            }`}
+                          >
+                            {status}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">Created At</th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">Actions</th>
             </tr>

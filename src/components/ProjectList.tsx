@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../lib/cn";
-import { IndianRupee } from "lucide-react";
+import { IndianRupee, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
@@ -24,6 +24,10 @@ export interface ProjectListProps {
   showMoney: boolean;
   canEdit?: boolean;
   onProjectsChange?: () => void;
+  statusFilter?: string;
+  setStatusFilter?: (filter: string) => void;
+  showFilterDropdown?: boolean;
+  setShowFilterDropdown?: (show: boolean) => void;
 }
 
 // --- FRAMER MOTION VARIANTS ---
@@ -51,7 +55,16 @@ const itemVariants = {
 };
 
 // --- MAIN COMPONENT ---
-export const ProjectList = ({ projects, showMoney, canEdit = false, onProjectsChange }: ProjectListProps) => {
+export const ProjectList = ({ 
+  projects, 
+  showMoney, 
+  canEdit = false, 
+  onProjectsChange,
+  statusFilter = 'All',
+  setStatusFilter,
+  showFilterDropdown = false,
+  setShowFilterDropdown
+}: ProjectListProps) => {
   const [editingStatusId, setEditingStatusId] = useState<string | null>(null);
 
   const handleStatusChange = async (projectId: string, newStatus: string) => {
@@ -82,7 +95,41 @@ export const ProjectList = ({ projects, showMoney, canEdit = false, onProjectsCh
               {showMoney && <th className="px-6 py-4 text-sm font-semibold text-gray-600">Budget</th>}
               {showMoney && <th className="px-6 py-4 text-sm font-semibold text-gray-600">Advance Payment</th>}
               {showMoney && <th className="px-6 py-4 text-sm font-semibold text-gray-600">Money to Receive</th>}
-              <th className="px-6 py-4 text-sm font-semibold text-gray-600">Status</th>
+              <th className="px-6 py-4 text-sm font-semibold text-gray-600">
+                <div className="flex items-center gap-2">
+                  <span>Status</span>
+                  {setStatusFilter && setShowFilterDropdown && (
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                        className={`p-1 rounded hover:bg-gray-200 transition-colors ${
+                          statusFilter !== 'All' ? 'bg-blue-100 text-blue-600' : 'text-gray-400'
+                        }`}
+                      >
+                        <Filter size={16} />
+                      </button>
+                      {showFilterDropdown && (
+                        <div className="absolute top-full right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                          {['All', 'Active', 'On Hold', 'Cancelled', 'Completed'].map((status) => (
+                            <button
+                              key={status}
+                              onClick={() => {
+                                setStatusFilter(status)
+                                setShowFilterDropdown(false)
+                              }}
+                              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                                statusFilter === status ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
+                              }`}
+                            >
+                              {status}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">Start Date</th>
             </tr>
           </thead>
