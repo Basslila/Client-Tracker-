@@ -1,10 +1,6 @@
-"use client";
-
-import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/utils/cn";
-import { Calendar, CheckCircle2, Circle, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import Link from "next/link";
+import { Calendar, CheckCircle2, Circle, Pencil, Trash2 } from "lucide-react";
 
 // --- TYPE DEFINITIONS ---
 export type TaskStatus = "To Do" | "In Progress" | "Completed" | string;
