@@ -9,6 +9,7 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true)
   const [userRole, setUserRole] = useState<UserRole>(null)
   const [projects, setProjects] = useState<any[]>([])
+  const [statusFilter, setStatusFilter] = useState<string>('All')
 
   useEffect(() => {
     fetchData()
@@ -34,6 +35,9 @@ export default function ProjectsPage() {
   }
 
   const showMoney = canSeeMoney(userRole)
+  const filteredProjects = statusFilter === 'All' 
+    ? projects 
+    : projects.filter(project => (project.status || 'Active') === statusFilter)
 
   return (
     <div className="space-y-6">
@@ -50,7 +54,23 @@ export default function ProjectsPage() {
         )}
       </div>
 
-      <ProjectList projects={projects} showMoney={showMoney} canEdit={canEdit(userRole)} onProjectsChange={fetchData} />
+      <div className="flex gap-2">
+        {['All', 'Active', 'On Hold', 'Cancelled', 'Completed'].map((status) => (
+          <button
+            key={status}
+            onClick={() => setStatusFilter(status)}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              statusFilter === status
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            {status}
+          </button>
+        ))}
+      </div>
+
+      <ProjectList projects={filteredProjects} showMoney={showMoney} canEdit={canEdit(userRole)} onProjectsChange={fetchData} />
     </div>
   )
 }

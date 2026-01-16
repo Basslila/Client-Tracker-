@@ -18,6 +18,7 @@ export default function HomePage() {
   const [userRole, setUserRole] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [editingStatusId, setEditingStatusId] = useState<string | null>(null)
+  const [statusFilter, setStatusFilter] = useState<string>('All')
 
   useEffect(() => {
     fetchData()
@@ -58,6 +59,10 @@ export default function HomePage() {
     return <div className="text-gray-600">Loading...</div>
   }
 
+  const filteredClients = statusFilter === 'All' 
+    ? clients 
+    : clients.filter(client => (client.status || 'Active') === statusFilter)
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -73,6 +78,22 @@ export default function HomePage() {
         )}
       </div>
 
+      <div className="flex gap-2">
+        {['All', 'Active', 'On Hold', 'Cancelled', 'Completed'].map((status) => (
+          <button
+            key={status}
+            onClick={() => setStatusFilter(status)}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              statusFilter === status
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            {status}
+          </button>
+        ))}
+      </div>
+
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-200">
@@ -86,7 +107,7 @@ export default function HomePage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {clients.map((client) => (
+            {filteredClients.map((client) => (
               <tr key={client.id} className="hover:bg-gray-50 transition-colors group">
                 <td className="px-6 py-4">
                   <Link to={`/clients/${client.id}`} className="flex items-center gap-3 font-medium text-gray-900 hover:text-blue-600">
@@ -156,7 +177,7 @@ export default function HomePage() {
                 </td>
               </tr>
             ))}
-            {clients.length === 0 && (
+            {filteredClients.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                   <div className="flex flex-col items-center justify-center">
